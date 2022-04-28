@@ -30,3 +30,23 @@ bcrypt.hash(password, saltRounds).then((hash) => {
     .catch((err) => console.log(err))
 })
 })
+
+router.post("/login", (req,res) => {
+    res.render("auth/login");
+});
+
+router.post("/login", (req,res) => {
+    const {username, password} = req.body
+    User.findOne({username}).then((user) => {
+        if (!user) {
+            return res.render("/login", {errorMessage: "user doesn't exist"});
+        } else if (bcrypt.compare(password, user.password)) {
+            req.session.currentUser = user;
+            res.redirect("/")
+        } else {
+            res.render("/login", {errorMessage: "Login failed"})
+        }
+    })
+})
+
+module.exports = router
